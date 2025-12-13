@@ -82,7 +82,8 @@ const GroupsView = () => {
             <div className="groups-grid">
                 {groups.map(group => (
                     <div key={group.id} className="card" style={{
-                        opacity: group.enabled ? 1 : 0.8
+                        opacity: group.enabled ? 1 : 0.8,
+                        padding: '1.25rem' // Override default padding for tighter feel
                     }}>
                         {editingId === group.id ? (
                             // Edit Mode
@@ -152,7 +153,7 @@ const GroupsView = () => {
                         ) : (
                             // View Mode
                             <div>
-                                <div className="justify-between items-center" style={{ display: 'flex', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div className="justify-between items-center" style={{ display: 'flex', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{group.name}</h3>
                                         <span style={{
@@ -196,10 +197,10 @@ const GroupsView = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                                        <strong style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>Blocked Domains</strong>
-                                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
+                                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                        <strong style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Blocked Domains</strong>
+                                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>
                                             {group.domains.length > 0 ? (
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                     {group.domains.slice(0, 5).map(d => (
@@ -212,9 +213,9 @@ const GroupsView = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                                        <strong style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>Active Schedule</strong>
-                                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+                                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                        <strong style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Active Schedule</strong>
+                                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
                                             {group.schedule ? (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                                     <span style={{ fontWeight: 600, color: 'var(--color-text-main)' }}>{group.schedule.days.join(', ')}</span>
