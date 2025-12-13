@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+    <!-- Unique identifier -->
+    <key>Label</key>
+    <string>com.blocker.scheduler</string>
+
+    <!-- Path to your scheduler binary -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/vinay/.blocker/blocker_scheduler</string>
+    </array>
+
+    <!-- Automatically restart if it crashes -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Start on login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Optional: log paths -->
+    <key>StandardOutPath</key>
+    <string>/Users/vinay/.blocker/scheduler.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/vinay/.blocker/scheduler_error.log</string>
+
+</dict>
+</plist>

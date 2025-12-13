@@ -15,7 +15,7 @@ use std::time::Duration;
 fn main() {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-    println!("[scheduler] Starting...");
+    println!("[scheduler] Starting.");
 
     ctrlc::set_handler(move || {
         r.store(false, Ordering::SeqCst);
@@ -217,12 +217,15 @@ fn call_helper(action: &str, payload: &str) -> std::io::Result<()> {
 fn validate_hosts(expected_domains: &[String]) -> std::io::Result<bool> {
     let content = fs::read_to_string("/etc/hosts")?;
 
-    let start_marker = "# >>> BLOCKER";
-    let end_marker = "# <<< BLOCKER";
+    let start_marker = "# >>> SITE_BLOCKER_START";
+    let end_marker = "# <<< SITE_BLOCKER_END";
 
     let start = match content.find(start_marker) {
         Some(i) => i,
-        None => return Ok(expected_domains.is_empty()),
+        None => {
+            // No block present — valid only if nothing should be blocked
+            return Ok(expected_domains.is_empty());
+        }
     };
 
     let end = match content.find(end_marker) {
@@ -234,32 +237,64 @@ fn validate_hosts(expected_domains: &[String]) -> std::io::Result<bool> {
         return Ok(false);
     }
 
+    // Extract ONLY the block between markers
     let block = &content[start + start_marker.len()..end];
 
-    let mut found_domains = Vec::new();
+    // ---- STEP 1: Extract real domains from hosts file ----
+
+    let mut found_domains = Vec::<String>::new();
 
     for line in block.lines() {
         let line = line.trim();
+
+        // Match both 127.0.0.1 domain and 0.0.0.0 domain lines
         if line.starts_with("127.0.0.1") || line.starts_with("0.0.0.0") {
             let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() >= 2 {
-                found_domains.push(normalize_domain(parts[1]));
+            if parts.len() < 2 {
+                continue;
+            }
+
+            let domain = normalize_domain(parts[1]);
+
+            // Remove leading "www." for comparison
+            let base = if domain.starts_with("www.") {
+                domain.trim_start_matches("www.").to_string()
+            } else {
+                domain.clone()
+            };
+
+            // Insert unique base domain
+            if !found_domains.contains(&base) {
+                found_domains.push(base);
             }
         }
     }
 
     found_domains.sort();
 
-    let mut expected_sorted = expected_domains.to_vec();
+    // ---- STEP 2: Normalize expected domains too ----
+
+    let mut expected_sorted: Vec<String> = expected_domains
+        .iter()
+        .map(|d| {
+            let d = normalize_domain(d);
+            if d.starts_with("www.") {
+                d.trim_start_matches("www.").to_string()
+            } else {
+                d
+            }
+        })
+        .collect();
+
     expected_sorted.sort();
 
-    if found_domains != expected_sorted {
-        println!(
-            "[scheduler] Host mismatch: expected {:?}, found {:?}",
-            expected_sorted, found_domains
-        );
-        return Ok(false);
-    }
+    // Debug log
+    println!(
+        "[scheduler] validate_hosts → expected={:?}, found={:?}",
+        expected_sorted, found_domains
+    );
 
-    Ok(true)
+    // ---- STEP 3: Compare lists ----
+
+    Ok(found_domains == expected_sorted)
 }
