@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocky - Focus on Autopilot</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            --color-primary: #3B82F6;
+            --color-bg: #0F1115;
+            --color-card: #181B21;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .bg-glow {
+            background: radial-gradient(circle at 50% 0%, #1a202c 0%, #0F1115 70%);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #2563EB;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Mascot Animation */
+        .mascot-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(2deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        /* Screenshot Container */
+        .screenshot-card {
+            background: #181B21;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot-card:hover {
+            transform: scale(1.02);
+            border-color: #3B82F6;
+        }
+    </style>
+</head>
+
+<body class="bg-glow flex flex-col min-h-screen">
+
+    <nav class="w-full py-6 px-6 max-w-6xl mx-auto flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <!-- <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">
+                B</div> -->
+            <span class="font-bold text-xl tracking-tight">Blocky</span>
+        </div>
+        <a href="https://github.com/vinayskanse/blocky" target="_blank"
+            class="text-gray-400 hover:text-white transition-colors flex items-center gap-2 font-medium">
+            <i data-lucide="github" class="w-5 h-5"></i>
+            <span>GitHub</span>
+        </a>
+    </nav>
+
+    <main class="flex flex-col items-center justify-center text-center px-6 pt-12 pb-24 relative">
+
+        <div
+            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-8 animate__animated animate__fadeInDown">
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            v0.1 • Native macOS App
+        </div>
+
+        <h1
+            class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight max-w-4xl animate__animated animate__fadeInUp">
+            Put your focus on <br>
+            <span class="text-blue-500">Autopilot.</span>
+        </h1>
+
+        <p
+            class="text-xl text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed animate__animated animate__fadeInUp animate__delay-1s">
+            Set your schedule once. Blocky handles the rest in the background. No manual toggles, no willpower needed.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 animate__animated animate__fadeInUp animate__delay-1s z-10">
+            <a href="https://github.com/vinayskanse/blocky/raw/master/Blocky.dmg" download="Blocky"
+                class="btn-primary px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 text-white min-w-[200px]">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                Download .dmg
+            </a>
+        </div>
+
+        <div class="mt-20 relative w-full max-w-5xl">
+
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-blue-600 blur-[100px] opacity-20 rounded-full pointer-events-none">
+            </div>
+
+            <div
+                class="absolute -top-3 -right-8 md:-right-12 z-20 w-24 h-24 md:w-30 md:h-30 mascot-float pointer-events-none">
+                <img src="./logo.png" alt="Blocky Mascot" class="drop-shadow-2xl rounded-2xl rotate-12">
+            </div>
+
+            <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="screenshot-card transform md:translate-y-12 opacity-80 hover:opacity-100 hover:z-10">
+                    <img src="./app_screenshots/2.png" alt="Edit Group" class="w-full h-auto">
+                </div>
+
+                <div class="screenshot-card z-10 shadow-2xl border-blue-500/30">
+                    <img src="./app_screenshots/1.png" alt="Dashboard" class="w-full h-auto">
+                </div>
+
+                <div class="screenshot-card transform md:translate-y-12 opacity-80 hover:opacity-100 hover:z-10">
+                    <img src="./app_screenshots/3.png" alt="Blocker Action" class="w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="bg-[#0B0D10] border-t border-gray-800 py-24 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div
+                    class="bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-colors">
+                    <i data-lucide="layers" class="w-8 h-8 text-blue-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Smart Groups</h3>
+                    <p class="text-gray-400 text-sm">Separate "Work", "News", and "Social". Block them at different
+                        times of the day.</p>
+                </div>
+
+                <div
+                    class="bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-colors">
+                    <i data-lucide="moon" class="w-8 h-8 text-purple-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Night Owl Mode</h3>
+                    <p class="text-gray-400 text-sm">Supports cross-midnight schedules (e.g., 10 PM to 6 AM) without
+                        glitches.</p>
+                </div>
+
+                <div
+                    class="bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-colors">
+                    <i data-lucide="lock" class="w-8 h-8 text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Tamper Proof</h3>
+                    <p class="text-gray-400 text-sm">The background scheduler self-heals. If you try to edit the hosts
+                        file, Blocky fixes it.</p>
+                </div>
+
+                <div
+                    class="bg-gray-900/50 p-6 rounded-2xl border border-gray-800 hover:border-gray-600 transition-colors">
+                    <i data-lucide="zap" class="w-8 h-8 text-orange-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Native Rust</h3>
+                    <p class="text-gray-400 text-sm">Lightweight and fast. Runs silently in the background without
+                        draining battery.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 text-center">
+        <div class="max-w-3xl mx-auto">
+
+            <img src="./cool_blocky.png" alt="Easy Install" class="w-40 h-40 mx-auto mb-6 rounded-xl rotate-[5deg]">
+
+            <h2 class="text-3xl font-bold mb-12">How to Install</h2>
+
+            <div class="flex flex-col md:flex-row justify-center gap-8 text-left">
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center font-bold shrink-0">1
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Download & Open</h4>
+                        <p class="text-gray-400 text-sm">Open the <code
+                                class="bg-gray-800 px-1 rounded">Blocky.dmg</code> file.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold shrink-0">2
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Run Installer</h4>
+                        <p class="text-gray-400 text-sm">Double-click <code
+                                class="bg-gray-800 px-1 rounded">Install Blocky.command</code>.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center font-bold shrink-0">3
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Authorize Once</h4>
+                        <p class="text-gray-400 text-sm">Enter password once to setup the helper.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-gray-500 text-sm border-t border-gray-800">
+        <p class="mb-2">&copy; 2025 Blocky. Open Source & Privacy Focused.</p>
+
+        <div class="flex items-center justify-center gap-1.5 mb-6 text-gray-400">
+            <span>Built with</span>
+            <i data-lucide="heart" class="w-3.5 h-3.5 text-red-500 fill-red-500/20 animate-pulse"></i>
+            <span>by</span>
+            <a href="https://github.com/vinayskanse" target="_blank"
+                class="font-semibold text-gray-300 hover:text-blue-400 transition-colors hover:underline decoration-wavy underline-offset-4">
+                vinayskanse
+            </a>
+        </div>
+
+        <div class="flex justify-center gap-6">
+            <a href="https://github.com/vinayskanse/blocky" class="hover:text-blue-500 transition-colors">Source
+                Code</a>
+            <a href="mailto:kanasevinay9451@gmail.com" class="hover:text-blue-500 transition-colors">Report Issue</a>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
