@@ -9,7 +9,7 @@ echo -e "${GREEN}Starting Build Process...${NC}"
 
 # Define paths
 ROOT_DIR="$(pwd)"
-DIST_DIR="$ROOT_DIR/dist/Control_Installer"
+DIST_DIR="$ROOT_DIR/installer_build"
 
 # Clean dist
 rm -rf "$DIST_DIR"
@@ -48,4 +48,4 @@ cp scripts/uninstall.sh "$DIST_DIR/"
 chmod +x "$DIST_DIR/install.sh"
 chmod +x "$DIST_DIR/uninstall.sh"
 
-echo -e "${GREEN}Build Complete! Artifacts are in dist/Control_Installer/${NC}"
+echo -e "${GREEN}Build Complete! Artifacts are in $DIST_DIR/${NC}"

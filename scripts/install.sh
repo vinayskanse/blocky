@@ -10,11 +10,30 @@ echo -e "${GREEN}Installing Control App & Services...${NC}"
 
 # 1. Install Control.app
 echo "Installing Application..."
-if [ -d "Control.app" ]; then
-    rm -rf /Applications/Control.app
-    cp -r Control.app /Applications/
+SOURCE_APP="./Control.app"
+TARGET_APP="/Applications/Control.app"
+
+if [ -d "$SOURCE_APP" ]; then
+    echo "Found $SOURCE_APP. Installing to $TARGET_APP..."
+    
+    # Remove existing install to ensure clean update
+    if [ -d "$TARGET_APP" ]; then
+        echo "Removing old version..."
+        rm -rf "$TARGET_APP"
+    fi
+    
+    # Copy new version
+    cp -r "$SOURCE_APP" /Applications/
+    
+    # Verify installation
+    if [ -d "$TARGET_APP" ]; then
+        echo "Success: Control.app installed to /Applications."
+    else
+        echo -e "${RED}Error: Failed to install Control.app to /Applications.${NC}"
+        exit 1
+    fi
 else
-    echo -e "${RED}Control.app not found in current directory!${NC}"
+    echo -e "${RED}Error: Control.app not found in installer directory ($(pwd))!${NC}"
     exit 1
 fi
 
