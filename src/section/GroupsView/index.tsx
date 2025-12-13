@@ -86,7 +86,6 @@ const GroupsView = () => {
         }
     }
 
-    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     const handleScheduleDayToggle = (day: string) => {
         setEditSchedule(prev => ({

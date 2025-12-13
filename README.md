@@ -15,7 +15,32 @@ Blocky is a powerful, schedule-based website blocker for macOS. Unlike simple ti
 
 ## Architecture
 
-This project is built with security and stability in mind, separating user interaction from system modification.
+```txt
+┌────────────┐
+│   UI App   │
+└─────┬──────┘
+      │ writes schedules, groups
+      ▼
+┌────────────┐
+│    DB      │  ← source of truth
+└─────┬──────┘
+      │ reads schedules & groups
+      │ 
+┌────────────┐
+│ Scheduler  │ reads marker block from /etc/hosts (verification only)
+└─────┬──────┘
+      │ if mismatch or rule change
+      ▼
+┌────────────┐
+│   Helper   │  ← root (setuid)
+└─────┬──────┘
+      │ writes marker block
+      ▼
+┌────────────┐
+│ /etc/hosts │  ← reflection of truth
+└────────────┘
+
+```
 
 ### 1. Main Application (Tauri + React)
 - **Role**: The user interface.
@@ -47,19 +72,19 @@ We have streamlined the build process into a single script.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/control.git
-   cd control
+   git clone https://github.com/vinayskanse/blocky.git
+   cd blocky
    ```
 
 2. **Build everything:**
    ```bash
-   ./scripts/build_all.sh
+   ./build_all.sh
    ```
-   This will compile the Rust binaries, build the frontend, and bundle everything into `Blocky_Installer/`.
+   This will compile the Rust binaries, build the frontend, and bundle everything into `installer_build/`.
 
 3. **Install:**
    ```bash
-   cd Blocky_Installer
+   cd installer_build
    ./install.sh
    ```
    *Note: You will be asked for your password once to install the helper tool.*
@@ -72,7 +97,7 @@ We have streamlined the build process into a single script.
 To completely remove the application and all background services:
 
 ```bash
-cd Blocky_Installer
+cd installer_build
 ./uninstall.sh
 ```
 
@@ -81,19 +106,10 @@ cd Blocky_Installer
 Building a secure blocker on macOS involves navigating complex permission systems. Here are some hurdles implemented:
 
 - **Sudo Fatigue**: We avoided asking for `sudo` on every schedule trigger by using a **SetUID Helper**. This is standard practice for VPNs and system tools.
-- **Database Synchronization**: Ensuring the UI and the Background Scheduler read from the exact same SQLite file was critical. We used `directories-rs` to resolve the platform-standard data path.
 - **Tamper Loop**: Initial versions triggered infinite write loops because the Helper rewrote domains (e.g., adding `www` or IP duplicates). We fixed this by normalizing domains before verification.
 - **Cross-Midnight Logic**: Scheduling logic isn't just `start < now < end`. We robustly handle `22:00 -> 06:00` ranges by checking if "today is start day" OR "yesterday was start day".
 
 ## Future Improvements
 
 This project is open source and can be improved! Feel free to contribute.
-
-- [ ] **Statistics**: Dashboard showing how much time you've saved.
-- [ ] **Hardcore Mode**: Prevent uninstalling or changing schedules during active blocks.
-- [ ] **Application Blocking**: Block native apps, not just websites.
-- [ ] **Network Extension**: Use macOS Network Extensions instead of `/etc/hosts` for more robust blocking (harder to bypass).
-
-## License
-
-MIT License. Feel free to fork and modify!
+To know more about the project, visit [LEARNINGS.md](LEARNINGS.md).
