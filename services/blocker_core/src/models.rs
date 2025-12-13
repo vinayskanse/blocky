@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Serialize, Deserialize, Debug)]
 pub struct Group {
-    pub id: Option<String>,
+    pub id: String,
     pub name: String,
     pub enabled: bool,
 }
@@ -48,4 +48,11 @@ pub struct NewSchedule<'a> {
     pub days: &'a str,
     pub start: &'a str,
     pub end: &'a str,
+}
+
+#[derive(Queryable, Serialize, Deserialize, Debug)]
+pub struct LastState {
+    pub id: Option<i32>,
+    pub last_domains: String,
+    pub last_update: Option<String>, // Timestamp might need chrono, using String/Option for now based on schema
 }

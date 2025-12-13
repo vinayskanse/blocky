@@ -10,7 +10,7 @@ diesel::table! {
 
 diesel::table! {
     groups (id) {
-        id -> Nullable<Text>,
+        id -> Text,
         name -> Text,
         enabled -> Bool,
     }

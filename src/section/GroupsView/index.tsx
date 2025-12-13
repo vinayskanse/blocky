@@ -100,10 +100,10 @@ const GroupsView = ({ onBack }: Props) => {
     };
 
     const handleDeleteGroup = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this group?')) return;
         try {
             await invoke('delete_group', { id });
             fetchGroups();
+
         } catch (error) {
             console.error('Failed to delete group:', error);
             alert('Failed to delete group: ' + error);

@@ -54,18 +54,13 @@ pub fn get_all_groups() -> Result<Vec<GroupResponse>, String> {
     let mut response = Vec::new();
 
     for group in groups {
-        let id = match group.id {
-            Some(ref id) => id,
-            None => continue,
-        };
-
-        let domains = get_domains(&mut conn, id)
+        let domains = get_domains(&mut conn, &group.id)
             .map_err(|e| e.to_string())?
             .into_iter()
             .map(|d| d.domain)
             .collect();
 
-        let schedule = get_schedule(&mut conn, id)
+        let schedule = get_schedule(&mut conn, &group.id)
             .map_err(|e| e.to_string())?
             .map(|s| ScheduleResponse {
                 days: s.days.split(',').map(|s| s.to_string()).collect(),
@@ -74,7 +69,7 @@ pub fn get_all_groups() -> Result<Vec<GroupResponse>, String> {
             });
 
         response.push(GroupResponse {
-            id: id.clone(),
+            id: group.id,
             name: group.name,
             enabled: group.enabled,
             domains,

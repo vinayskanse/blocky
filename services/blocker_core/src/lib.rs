@@ -134,3 +134,15 @@ pub fn delete_group(conn: &mut SqliteConnection, group_id_val: &str) -> QueryRes
 
     diesel::delete(groups.filter(id.eq(group_id_val))).execute(conn)
 }
+
+pub fn get_last_state(conn: &mut SqliteConnection) -> QueryResult<LastState> {
+    use crate::schema::last_state::dsl::*;
+    last_state.filter(id.eq(1)).first::<LastState>(conn)
+}
+
+pub fn update_last_state(conn: &mut SqliteConnection, new_domains: &str) -> QueryResult<usize> {
+    use crate::schema::last_state::dsl::*;
+    diesel::update(last_state.filter(id.eq(1)))
+        .set(last_domains.eq(new_domains))
+        .execute(conn)
+}
