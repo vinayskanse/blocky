@@ -1,11 +1,12 @@
-import { invoke } from '@tauri-apps/api/core';
 import React, { useState } from 'react';
+import { useBlockyContext } from '../../context/BlockyContext';
 
 type Props = {
     onClose: () => void;
 };
 
 const NewGroupModal = ({ onClose }: Props) => {
+    const { addGroup } = useBlockyContext();
     const [name, setName] = useState('');
     const [domains, setDomains] = useState('');
     const [startTime, setStartTime] = useState('09:00');
@@ -28,7 +29,7 @@ const NewGroupModal = ({ onClose }: Props) => {
             // Split domains by new line and filter empty strings
             const domainList = domains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
 
-            await invoke('create_group', {
+            await addGroup({
                 name,
                 domains: domainList,
                 days: selectedDays,
@@ -43,28 +44,8 @@ const NewGroupModal = ({ onClose }: Props) => {
     };
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-            backdropFilter: 'blur(5px)'
-        }}>
-            <div className="card" style={{
-                width: '100%',
-                maxWidth: '500px',
-                padding: '2rem',
-                position: 'relative',
-                animation: 'scaleIn 0.2s ease-out',
-                maxHeight: '90vh',
-                overflowY: 'auto'
-            }}>
+        <div className="modal-overlay">
+            <div className="card modal-content">
                 <button
                     onClick={onClose}
                     style={{
@@ -84,7 +65,7 @@ const NewGroupModal = ({ onClose }: Props) => {
 
                 <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Create New Group</h2>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <form onSubmit={handleSubmit} className="flex-col gap-4">
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Group Name</label>
                         <input
@@ -146,7 +127,7 @@ const NewGroupModal = ({ onClose }: Props) => {
 
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-full"
                         style={{
                             marginTop: '1rem',
                             padding: '0.8rem',

@@ -3,28 +3,27 @@ import "./App.css";
 
 import GroupsView from "./section/GroupsView";
 import NewGroupModal from "./section/NewGroupModal";
+import { useBlockyContext } from "./context/BlockyContext";
+import LandingPage from "./section/LandingPage/LandingPage";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const { groups } = useBlockyContext();
   return (
     <main className="container">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '3rem', gap: '1rem' }}>
-        <img src="/logo.png" alt="Blocky Logo" className="logo-img" />
-        <h1 style={{ fontSize: '3rem', letterSpacing: '-1px', margin: 0 }}>Blocky</h1>
-      </div>
+      {groups.length === 0 ? <LandingPage /> : null}
 
       {/* Main Content Area */}
-      <div style={{ width: '100%' }}>
+      <div className="w-full">
 
         {/* Actions Bar */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="btn btn-primary"
+            className="btn btn-primary btn-full"
           >
-            <span style={{ fontSize: '1.2rem', lineHeight: '1' }}>+</span> Create New Group
+            <span style={{ fontSize: '1.2rem', }}>+</span> Create New Group
           </button>
         </div>
 

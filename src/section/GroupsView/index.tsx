@@ -1,23 +1,8 @@
-import { useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
-
-type Schedule = {
-    days: string[];
-    start: string;
-    end: string;
-}
-
-type Group = {
-    id: string;
-    name: string;
-    enabled: boolean;
-    domains: string[];
-    schedule?: Schedule;
-}
+import { useState } from 'react';
+import { useBlockyContext, Group, Schedule } from '../../context/BlockyContext';
 
 const GroupsView = () => {
-    const [groups, setGroups] = useState<Group[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { groups, loading, updateGroup, updateDomains, updateSchedule, deleteGroup } = useBlockyContext();
     const [editingId, setEditingId] = useState<string | null>(null);
 
     // Edit State
@@ -25,21 +10,6 @@ const GroupsView = () => {
     const [editDomains, setEditDomains] = useState('');
     const [editSchedule, setEditSchedule] = useState<Schedule>({ days: [], start: '09:00', end: '17:00' });
 
-    useEffect(() => {
-        fetchGroups();
-    }, []);
-
-    const fetchGroups = async () => {
-        try {
-            const res = await invoke<Group[]>('get_all_groups');
-            setGroups(res);
-        } catch (error) {
-            console.error(error);
-            alert('Failed to fetch groups');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const startEditing = (group: Group) => {
         setEditingId(group.id);
@@ -55,21 +25,19 @@ const GroupsView = () => {
     const saveGroup = async (id: string) => {
         try {
             // Update name/enabled
-            await invoke('update_group', { id, name: editName, enabled: true }); // Keep enabled true for now or add toggle
+            await updateGroup(id, editName, true); // Keep enabled true for now or add toggle
 
             // Update domains
             const domainList = editDomains.split('\n').map(d => d.trim()).filter(d => d.length > 0);
-            await invoke('update_domains', { id, domains: domainList });
+            await updateDomains(id, domainList);
 
             // Update schedule
-            await invoke('update_schedule', {
-                id,
+            await updateSchedule(id, {
                 days: editSchedule.days,
                 startTime: editSchedule.start,
                 endTime: editSchedule.end
             });
 
-            await fetchGroups();
             setEditingId(null);
         } catch (error) {
             console.error(error);
@@ -79,8 +47,7 @@ const GroupsView = () => {
 
     const toggleGroup = async (group: Group) => {
         try {
-            await invoke('update_group', { id: group.id, name: group.name, enabled: !group.enabled });
-            fetchGroups();
+            await updateGroup(group.id, group.name, !group.enabled);
         } catch (error) {
             console.error(error);
         }
@@ -96,29 +63,30 @@ const GroupsView = () => {
 
     const handleDeleteGroup = async (id: string) => {
         try {
-            await invoke('delete_group', { id });
-            fetchGroups();
-
+            await deleteGroup(id);
         } catch (error) {
             console.error('Failed to delete group:', error);
             alert('Failed to delete group: ' + error);
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "60vh"
+    }}>Loading...</div>;
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto', color: 'var(--color-text-main)' }}>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="w-full">
+            <div className="groups-grid">
                 {groups.map(group => (
                     <div key={group.id} className="card" style={{
-                        borderLeft: group.enabled ? '4px solid var(--color-success)' : '4px solid transparent',
                         opacity: group.enabled ? 1 : 0.8
                     }}>
                         {editingId === group.id ? (
                             // Edit Mode
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="flex-col gap-4">
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.9rem' }}>Group Name</label>
                                     <input
@@ -134,7 +102,7 @@ const GroupsView = () => {
                                         value={editDomains}
                                         onChange={e => setEditDomains(e.target.value)}
                                         rows={4}
-                                        style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-xs)', border: '2px solid #E2E8F0', fontFamily: 'monospace' }}
+                                        style={{ fontFamily: 'monospace' }}
                                     />
                                 </div>
 
@@ -146,7 +114,7 @@ const GroupsView = () => {
                                                 key={day}
                                                 onClick={() => handleScheduleDayToggle(day)}
                                                 className={`btn ${editSchedule.days.includes(day) ? 'btn-primary' : 'btn-secondary'}`}
-                                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}
+                                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                                             >
                                                 {day}
                                             </button>
@@ -170,29 +138,29 @@ const GroupsView = () => {
                                     <button
                                         onClick={() => setEditSchedule({ days: [], start: '', end: '' })}
                                         className="btn btn-ghost"
-                                        style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}
+                                        style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.5rem' }}
                                     >
                                         Clear Schedule
                                     </button>
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #E2E8F0' }}>
-                                    <button onClick={() => saveGroup(group.id)} className="btn btn-primary">Save Changes</button>
-                                    <button onClick={cancelEditing} className="btn btn-secondary">Cancel</button>
+                                    <button onClick={() => saveGroup(group.id)} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>Save Changes</button>
+                                    <button onClick={cancelEditing} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>Cancel</button>
                                 </div>
                             </div>
                         ) : (
                             // View Mode
                             <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>{group.name}</h3>
+                                <div className="justify-between items-center" style={{ display: 'flex', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{group.name}</h3>
                                         <span style={{
                                             backgroundColor: group.enabled ? 'var(--color-success-bg)' : 'rgba(255, 255, 255, 0.05)',
                                             color: group.enabled ? 'var(--color-success)' : 'var(--color-text-muted)',
-                                            padding: '0.25rem 0.75rem',
+                                            padding: '0.15rem 0.5rem',
                                             borderRadius: '999px',
-                                            fontSize: '0.75rem',
+                                            fontSize: '0.65rem',
                                             fontWeight: 700,
                                             letterSpacing: '0.05em',
                                             textTransform: 'uppercase',
@@ -201,20 +169,34 @@ const GroupsView = () => {
                                             {group.enabled ? 'Active' : 'Inactive'}
                                         </span>
                                     </div>
+
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
                                             onClick={() => toggleGroup(group)}
                                             className={`btn ${group.enabled ? 'btn-secondary' : 'btn-primary'}`}
                                             title={group.enabled ? 'Disable Group' : 'Enable Group'}
+                                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', minWidth: 'auto' }}
                                         >
                                             {group.enabled ? 'Disable' : 'Enable'}
                                         </button>
-                                        <button onClick={() => startEditing(group)} className="btn btn-secondary">Edit</button>
-                                        <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-danger">Delete</button>
+                                        <button
+                                            onClick={() => startEditing(group)}
+                                            className="btn btn-secondary"
+                                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', minWidth: 'auto' }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteGroup(group.id)}
+                                            className="btn btn-danger"
+                                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', minWidth: 'auto' }}
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                                     <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)' }}>
                                         <strong style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>Blocked Domains</strong>
                                         <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>
@@ -254,13 +236,16 @@ const GroupsView = () => {
                     </div>
                 ))}
 
-                {groups.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-light)' }}>
-                        <p>No groups created yet. Click "Create new group" to start blocking!</p>
-                    </div>
-                )}
+
+                {
+                    groups.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-light)' }}>
+                            <p>No groups created yet. Click "Create new group" to start blocking!</p>
+                        </div>
+                    )
+                }
             </div>
-        </div>
+        </div >
     );
 };
 

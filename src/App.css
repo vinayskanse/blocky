@@ -46,11 +46,11 @@
 
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
+  width: 100%;
   background-color: var(--color-bg);
   background-image: radial-gradient(circle at 50% 0%, #1a1d26 0%, #0F1115 70%);
-  /* Subtle top highlight */
+  overflow-x: hidden;
 }
 
 /* Headings */
@@ -59,18 +59,20 @@ h2,
 h3,
 h4 {
   font-family: var(--font-heading);
-  color: var(--color-charcoal);
+  color: var(--color-text-main);
   margin: 0;
 }
 
 /* Container */
 .container {
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1rem;
+  width: 100%;
   max-width: 900px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 /* Typography */
@@ -86,23 +88,62 @@ h6 {
   letter-spacing: -0.02em;
 }
 
+/* Landing Page */
+.landing-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 2rem;
+  width: 100%;
+  text-align: center;
+}
+
+.landing-page h1 {
+  font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: -2px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.logo-img {
+  width: 200px;
+  max-width: 40%;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: -1rem;
+}
+
 /* Utilities */
 .card {
   background-color: var(--color-card-bg);
   border-radius: var(--radius-lg);
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-lg);
   color: var(--color-text-main);
   border: 1px solid var(--color-card-border);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
+@media (min-width: 768px) {
+  .card {
+    padding: 2rem;
+  }
+}
+
 .card:hover {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
+.groups-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
 .btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.25rem;
@@ -114,7 +155,11 @@ h6 {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   gap: 0.5rem;
-  line-height: 1;
+  /* width: 100%; Remove default 100% width, let container control it or use w-full class if needed */
+}
+
+.btn-full {
+  width: 100%;
 }
 
 .btn:active {
@@ -136,7 +181,6 @@ h6 {
 
 .btn-secondary {
   background-color: rgba(255, 255, 255, 0.05);
-  /* very subtle */
   color: var(--color-text-secondary);
   border: 1px solid var(--color-card-border);
 }
@@ -175,23 +219,22 @@ select {
   width: 100%;
   padding: 0.8rem 1rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background-color: #222;
-  /* Darker input bg */
+  border: 1px solid transparent;
+  background-color: rgba(0, 0, 0, 0.3);
   color: var(--color-text-main);
   font-family: inherit;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
   box-sizing: border-box;
-  /* Fix width issues */
 }
 
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
+  background-color: rgba(0, 0, 0, 0.5);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 /* Animations */
@@ -207,13 +250,67 @@ select:focus {
   }
 }
 
-/* Logo Fix */
-/* Logo Fix */
-.logo-img {
-  width: 180px;
-  border-radius: 16px;
-  object-fit: contain;
-  /* Prevent distortion */
-  background-color: transparent;
-  /* Ensure no white box */
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Responsive Utilities */
+.hidden-mobile {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .hidden-mobile {
+    display: block;
+  }
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
 }
