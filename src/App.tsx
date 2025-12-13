@@ -6,61 +6,32 @@ import GroupsView from "./section/GroupsView";
 import NewGroupModal from "./section/NewGroupModal";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-  const [view, setView] = useState<'home' | 'groups'>('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
 
   return (
     <main className="container">
-      {view === 'home' ? (
-        <>
-          <h1>Control</h1>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '3rem', gap: '1rem' }}>
+        <img src="/logo.png" alt="Blocky Logo" className="logo-img" />
+        <h1 style={{ fontSize: '3rem', letterSpacing: '-1px', margin: 0 }}>Blocky</h1>
+      </div>
 
-          <div className="row">
-            <a href="https://tauri.app" target="_blank">
-              <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-            </a>
-          </div>
-          <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      {/* Main Content Area */}
+      <div style={{ width: '100%' }}>
 
-          <form
-            className="row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              greet();
-            }}
+        {/* Actions Bar */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="btn btn-primary"
           >
-            <input
-              id="greet-input"
-              onChange={(e) => setName(e.currentTarget.value)}
-              placeholder="Enter a name..."
-            />
-            <button type="submit">Greet</button>
-          </form>
-          <p>{greetMsg}</p>
+            <span style={{ fontSize: '1.2rem', lineHeight: '1' }}>+</span> Create New Group
+          </button>
+        </div>
 
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-            <button onClick={() => setIsModalOpen(true)}>Create new group</button>
-            <button onClick={() => setView('groups')}>View all groups</button>
-            <button onClick={() => invoke('my_custom_command')}>Block</button>
-          </div>
-        </>
-      ) : (
-        <GroupsView onBack={() => setView('home')} />
-      )}
+        {/* Groups List */}
+        <GroupsView />
+      </div>
 
       {isModalOpen && (
         <NewGroupModal onClose={() => setIsModalOpen(false)} />

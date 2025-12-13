@@ -1,10 +1,9 @@
-
 import { invoke } from '@tauri-apps/api/core';
 import React, { useState } from 'react';
 
 type Props = {
     onClose: () => void;
-}
+};
 
 const NewGroupModal = ({ onClose }: Props) => {
     const [name, setName] = useState('');
@@ -50,113 +49,108 @@ const NewGroupModal = ({ onClose }: Props) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
+            backgroundColor: 'rgba(0,0,0,0.6)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1000,
-            color: 'white' // Ensure text is visible on dark background if parent styles don't set it
+            backdropFilter: 'blur(5px)'
         }}>
-            <div style={{
-                backgroundColor: '#2f2f2f',
-                padding: '20px',
-                borderRadius: '8px',
-                minWidth: '400px', // Increased width a bit
+            <div className="card" style={{
+                width: '100%',
+                maxWidth: '500px',
+                padding: '2rem',
                 position: 'relative',
+                animation: 'scaleIn 0.2s ease-out',
                 maxHeight: '90vh',
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '15px'
+                overflowY: 'auto'
             }}>
                 <button
                     onClick={onClose}
                     style={{
                         position: 'absolute',
-                        top: '10px',
-                        right: '10px',
+                        top: '1rem',
+                        right: '1rem',
                         border: 'none',
                         background: 'transparent',
-                        color: 'white',
-                        fontSize: '1.2rem',
-                        cursor: 'pointer'
+                        color: 'var(--color-text-light)',
+                        fontSize: '1.5rem',
+                        cursor: 'pointer',
+                        lineHeight: 1
                     }}
                 >
                     &times;
                 </button>
-                <h2 style={{ marginTop: 0 }}>Create New Group</h2>
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <label>Group Name</label>
+
+                <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Create New Group</h2>
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Group Name</label>
                         <input
                             type="text"
-                            placeholder="e.g. Work Focus"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            required
-                            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white' }}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                        <label>Domains (one per line)</label>
-                        <textarea
-                            placeholder="example.com&#10;social.media"
-                            value={domains}
-                            onChange={(e) => setDomains(e.target.value)}
-                            rows={5}
-                            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white', fontFamily: 'monospace' }}
+                            placeholder="e.g. Work Focus"
+                            autoFocus
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '5px' }}>Schedule Days</label>
-                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Domains to Block</label>
+                        <textarea
+                            value={domains}
+                            onChange={(e) => setDomains(e.target.value)}
+                            placeholder="facebook.com&#10;twitter.com"
+                            rows={4}
+                            style={{ fontFamily: 'monospace' }}
+                        />
+                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text-light)' }}>One domain per line</span>
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Active Days</label>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                             {daysOfWeek.map(day => (
-                                <label key={day} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedDays.includes(day)}
-                                        onChange={() => handleDayToggle(day)}
-                                    />
+                                <button
+                                    key={day}
+                                    type="button"
+                                    onClick={() => handleDayToggle(day)}
+                                    className={`btn ${selectedDays.includes(day) ? 'btn-primary' : 'btn-secondary'}`}
+                                    style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                                >
                                     {day}
-                                </label>
+                                </button>
                             ))}
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <label>Start Time</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Start Time</label>
                             <input
                                 type="time"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
-                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white' }}
                             />
                         </div>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <label>End Time</label>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>End Time</label>
                             <input
                                 type="time"
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value)}
-                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white' }}
                             />
                         </div>
                     </div>
 
                     <button
                         type="submit"
+                        className="btn btn-primary"
                         style={{
-                            padding: '10px',
-                            backgroundColor: '#646cff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            marginTop: '10px'
+                            marginTop: '1rem',
+                            padding: '0.8rem',
+                            fontWeight: 'bold'
                         }}
                     >
                         Create Group
@@ -164,7 +158,7 @@ const NewGroupModal = ({ onClose }: Props) => {
                 </form>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default NewGroupModal
+export default NewGroupModal;
