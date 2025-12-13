@@ -64,9 +64,20 @@ Blocky is a powerful, schedule-based website blocker for macOS. Unlike simple ti
 ### Prerequisites
 - macOS
 - Rust & Cargo installed
-- Node.js & NPM installed
+- Node.js & NPM installed (only for building from source)
 
-### Build & Install
+### Installation via DMG (Recommended)
+
+1. **Download the latest release** (Blocky.dmg).
+2. **Open** the `.dmg` file.
+3. **Double-click** on `Install Blocky.command`.
+   - This script will automatically copy the app to Applications and set up the background scheduler.
+   - You will be asked for your password *once* to authorize the helper tool (required for blocking websites).
+4. **Done!** Open **Blocky** from your Applications folder.
+
+To uninstall, run `Uninstall Blocky.command` found in the same DMG or folder.
+
+### Build from Source
 
 We have streamlined the build process into a single script.
 

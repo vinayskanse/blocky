@@ -97,4 +97,4 @@ launchctl unload "$PLIST_DEST" 2>/dev/null || true
 launchctl load -w "$PLIST_DEST"
 
 echo -e "${GREEN}Installation Complete!${NC}"
-echo "You can find 'Control' in your Applications folder."
+echo "You can find 'Blocky' in your Applications folder."

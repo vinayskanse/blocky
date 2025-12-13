@@ -4,7 +4,7 @@ set -e
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-echo -e "${GREEN}Uninstalling Control App & Services...${NC}"
+echo -e "${GREEN}Uninstalling Blocky App & Services...${NC}"
 
 # 1. Stop and Remove Scheduler
 echo "Stopping Scheduler..."

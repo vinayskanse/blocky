@@ -36,8 +36,8 @@ echo -e "${GREEN}Building Tauri Application...${NC}"
 # Note: Ensure you have your frontend built if needed? npm run tauri build does both
 npm run tauri build
 # Copy the .app bundle
-# Path might vary based on target, usually src-tauri/target/release/bundle/macos/Control.app
-cp -r src-tauri/target/release/bundle/macos/control.app "$DIST_DIR/Control.app"
+# Path might vary based on target, usually src-tauri/target/release/bundle/macos/Blocky.app
+cp -r src-tauri/target/release/bundle/macos/Blocky.app "$DIST_DIR/Blocky.app"
 
 # 4. Copy Scripts
 echo -e "${GREEN}Copying Scripts...${NC}"
