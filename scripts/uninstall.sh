@@ -27,7 +27,7 @@ fi
 
 # 3. Remove App
 echo "Removing Application..."
-rm -rf /Applications/Control.app
+rm -rf /Applications/Blocky.app
 
 # 4. Clean Hosts (Optional/Advanced)
 # If we uninstall, the /etc/hosts might still have blocks if scheduler didn't clean up.

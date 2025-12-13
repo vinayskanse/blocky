@@ -8,10 +8,10 @@ NC='\033[0m'
 
 echo -e "${GREEN}Installing Control App & Services...${NC}"
 
-# 1. Install Control.app
+# 1. Install Blocky.app
 echo "Installing Application..."
-SOURCE_APP="./Control.app"
-TARGET_APP="/Applications/Control.app"
+SOURCE_APP="./Blocky.app"
+TARGET_APP="/Applications/Blocky.app"
 
 if [ -d "$SOURCE_APP" ]; then
     echo "Found $SOURCE_APP. Installing to $TARGET_APP..."
@@ -27,13 +27,13 @@ if [ -d "$SOURCE_APP" ]; then
     
     # Verify installation
     if [ -d "$TARGET_APP" ]; then
-        echo "Success: Control.app installed to /Applications."
+        echo "Success: Blocky.app installed to /Applications."
     else
-        echo -e "${RED}Error: Failed to install Control.app to /Applications.${NC}"
+        echo -e "${RED}Error: Failed to install Blocky.app to /Applications.${NC}"
         exit 1
     fi
 else
-    echo -e "${RED}Error: Control.app not found in installer directory ($(pwd))!${NC}"
+    echo -e "${RED}Error: Blocky.app not found in installer directory ($(pwd))!${NC}"
     exit 1
 fi
 
