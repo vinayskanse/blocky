@@ -1,0 +1,628 @@
+BLOCKER APP — COMPLETE PROJECT OVERVIEW (SUMMARY)
+
+This is the end-to-end architecture and journey of building a scheduled website blocker on macOS using:
+
+Rust backend components
+
+A privileged helper
+
+A background scheduler
+
+SQLite database
+
+UI app (Tauri/Electron future)
+
+1. Core Architecture
+A. Main App (Tauri/Electron UI)
+
+Lets users create groups
+
+Add domain lists
+
+Create schedules (start/end time, days)
+
+Writes everything into a SQLite database using Diesel ORM
+
+Main app runs as a normal user (no sudo ever needed).
+
+B. Privileged Helper (blocker_helper)
+
+Separate Rust binary installed at /usr/local/bin/blocker_helper
+
+Has setuid root so it can modify /etc/hosts
+
+Accepts commands:
+
+blocker_helper apply '<json-of-domains>'
+blocker_helper clear
+
+
+Writes inside safe markers:
+
+# >>> SITE_BLOCKER_START
+# <<< SITE_BLOCKER_END
+
+
+Helper never does scheduling logic; only writes hosts file.
+
+C. Scheduler (blocker_scheduler)
+
+Background Rust service
+
+Runs every 60 seconds
+
+Reads DB and determines:
+
+Which groups are active right now?
+Which domains should be blocked now?
+Did the domain list change?
+Was the hosts file tampered with?
+
+
+Calls helper only when necessary
+
+Stores last applied state in DB
+
+Has logs for debugging
+
+Runs under your user via LaunchAgent; does not require root.
+
+2. Scheduling Logic
+
+Correct schedule evaluation includes:
+
+✔ Normal schedules (start < end)
+
+Example:
+
+09:00–17:00
+
+✔ Cross-midnight schedules (start > end)
+
+Example:
+
+22:00–12:00
+
+
+Schedule considered active if:
+
+current time >= start
+
+OR current time < end on next day
+
+Scheduler handles this perfectly.
+
+3. Database Structure
+
+Tables:
+
+groups
+
+id, name, enabled
+
+domains
+
+id, group_id, domain
+
+schedules
+
+id, group_id, start, end, days ("Mon,Tue,Wed")
+
+last_state
+
+id, last_domains (JSON array of sorted domains)
+
+4. Host File Validation + Tamper Detection
+
+Scheduler reads:
+
+/etc/hosts
+
+
+Extracts the block between markers:
+
+# >>> SITE_BLOCKER_START
+# <<< SITE_BLOCKER_END
+
+
+Normalizes found domains:
+
+Removes www.
+
+Ignores multiple IP lines (127.0.0.1 / 0.0.0.0)
+
+Removes duplicates
+
+Converts to lowercase
+
+Compares to expected sorted domain list.
+
+If mismatch → tampering detected → reapply.
+
+5. Startup Persistence (LaunchAgent)
+
+Scheduler runs automatically on macOS using:
+
+~/Library/LaunchAgents/com.blocker.scheduler.plist
+
+
+LaunchAgent ensures:
+
+Starts on login
+
+Restarts if crashes
+
+Logs to ~/.blocker/scheduler.log
+
+Helper keeps permission through setuid.
+
+6. Final Packaged System
+
+Distribution bundle must include:
+
+Blocker.app
+blocker_helper (setuid)
+blocker_scheduler
+install.sh
+uninstall.sh
+
+
+Installer:
+
+Copies app to /Applications
+
+Installs helper with sudo + setuid
+
+Installs scheduler
+
+Installs LaunchAgent
+
+Starts service automatically
+
+This makes sharing/testing simple.
+
+🔥 WHAT WE LEARNED (NEW KNOWLEDGE + CHALLENGES + FIXES)
+1. macOS cannot give sudo to apps continuously
+
+→ Instead, build a setuid helper installed one time with root permissions.
+
+2. Scheduler and App must use the SAME DB path
+
+We had a bug where:
+
+UI wrote to ~/Library/.../blocker.db
+
+Scheduler read ./blocker.db
+
+Fix: unify DB path using ProjectDirs.
+
+3. Marker mismatch caused infinite tamper loop
+
+Helper wrote:
+
+# >>> SITE_BLOCKER_START
+
+
+Scheduler expected:
+
+# >>> BLOCKER
+
+
+→ Scheduler always thought "markers missing → tampered".
+
+Fix: use same markers everywhere.
+
+4. Hosts validation must normalize domains
+
+Helper wrote:
+
+127.0.0.1 domain
+127.0.0.1 www.domain
+0.0.0.0 domain
+0.0.0.0 www.domain
+
+
+Scheduler expected:
+
+["domain"]
+
+
+→ mismatch → endless tamper detection
+
+Fix: reduce found domains to unique base domain.
+
+5. Scheduling across midnight is tricky
+
+We solved it with:
+
+if start < end: normal
+else: cross-midnight
+
+6. Rust HashSet iteration order caused JSON mismatches
+
+Sorting domain list fixed unnecessary helper calls.
+
+7. LaunchAgent vs LaunchDaemon
+
+LaunchAgent is correct because:
+
+Runs under user
+
+Does not need root
+
+Works with helper setuid
+
+8. Packaging binaries safely
+
+Must ensure:
+
+helper has 4755 permissions
+
+scheduler does not require sudo
+
+LaunchAgent loads on login
+
+🎯 FINAL RESULT
+
+You now have a robust system that:
+
+Schedules domain blocking reliably
+
+Self-heals tampering in /etc/hosts
+
+Runs automatically at startup
+
+Uses a secure helper for privileged operations
+
+Is safe and efficient
+
+Can be packaged and shared
+
+Has clean logs and stable behavior
+
+A fully functional, production-quality macOS website blocker foundation.
+
+context for next task dont do yet anything
+
+
+🧠 COMPLETE PROJECT STORY — FROM IDEA → DESIGN → PROBLEMS → SOLUTIONS
+
+This section combines everything you said, everything we discussed, and all technical insights discovered along the way, written in a clear flow.
+
+1. YOUR ORIGINAL IDEA
+
+You wanted to build:
+
+A macOS app similar to SelfControl
+
+But with schedules instead of one-time timers
+
+With multiple groups, each with its own domain list and schedule
+
+Using Tauri (or Electron)
+
+And you wanted it to be fast, simple, reliable.
+
+Your initial questions were:
+
+“How do we block websites?”
+
+You assumed maybe editing /etc/hosts directly from the app.
+
+“Do we always need sudo?”
+
+You were unsure how apps like SelfControl do it without asking password every time.
+
+“Can the scheduler run even if the app is closed?”
+
+You needed blocking to continue independently.
+
+“Will background service eat CPU or break system?”
+
+You wanted a safe method.
+
+2. YOUR EARLY ASSUMPTION
+
+You initially imagined:
+
+App (Tauri) → edits /etc/hosts directly → user gives sudo once → done
+
+
+But then you realized the problem:
+
+Scheduled events run later
+
+The app will be closed
+
+macOS will NOT remember sudo
+
+/etc/hosts cannot be edited without root
+
+Therefore schedule-triggered edits would fail
+
+This led you to ask:
+
+“How will scheduled edits work without asking sudo every time?”
+
+This was the turning point.
+
+3. OUR RESEARCH AND DISCUSSION
+
+We explored:
+
+❌ Option 1: App runs with sudo
+
+Rejected because:
+
+Dangerous
+
+MacOS won’t allow a GUI app to stay root
+
+Security nightmare
+
+❌ Option 2: Store sudo password
+
+Impossible and insecure.
+
+❌ Option 3: Ask password every time a schedule fires
+
+Annoying and useless.
+
+✔ Option 4 (CORRECT): Privileged helper binary (setuid root)
+
+This matches the architecture used by:
+
+SelfControl
+
+Freedom
+
+ColdTurkey
+
+RescueTime
+
+Torrent clients
+
+VPN clients
+
+You understood this well and said:
+
+“So the privileged service is just a different thing with power to edit /etc/hosts and app is separate… am I getting this right?”
+
+Yes — perfect.
+
+4. FINAL ARCHITECTURE FROM OUR DISCUSSION
+Component 1 — The helper
+
+Written in Rust
+
+Installed with setuid root
+
+Only job: edit /etc/hosts inside markers
+
+Safe and limited power
+
+You said:
+
+“Let's keep everything in Rust only.”
+
+So we did.
+
+Component 2 — The Scheduler
+
+Runs every 60 seconds
+
+Calculates active domains
+
+Compares with last applied state
+
+Calls helper only if needed
+
+Detects tampering
+
+Runs even when app is closed
+
+You asked:
+
+“Is it safe to run something every minute?”
+
+We verified yes — near-zero CPU.
+
+Component 3 — The UI App
+
+Writes DB
+
+Doesn’t touch hosts
+
+Doesn’t need sudo
+
+Completely safe
+
+Component 4 — SQLite Database
+
+Designed through discussion:
+
+Tables:
+
+groups
+
+domains
+
+schedules
+
+last_state
+
+You asked:
+
+“Why keep last_state now?”
+
+Because it prevents unnecessary writes.
+
+5. DISCOVERY OF CRITICAL PROBLEMS
+Problem 1: Wrong DB path
+
+You realized scheduler was applying example.com even after you added hello.com, meow.com, etc.
+
+“What do you think is happening?”
+
+The issue:
+
+UI wrote to:
+~/Library/Application Support/com.Blocker.Blocker/blocker.db
+
+Scheduler read:
+./blocker.db (created by Diesel CLI)
+
+We fixed this by enforcing a single DB path with ProjectDirs.
+
+Problem 2: Host markers mismatch
+
+Helper wrote:
+
+# >>> SITE_BLOCKER_START
+# <<< SITE_BLOCKER_END
+
+
+Scheduler looked for:
+
+# >>> BLOCKER
+# <<< BLOCKER
+
+
+You said:
+
+“It always thinks tamper… help please”
+
+The fix was to unify markers system-wide.
+
+Problem 3: Hosts validation false-positive tampering
+
+Scheduler extracted:
+
+127.0.0.1 domain
+127.0.0.1 www.domain
+0.0.0.0 domain
+0.0.0.0 www.domain
+
+
+Expected:
+
+["domain"]
+
+
+So scheduler constantly logged:
+
+Tamper detected! Re-applying block list.
+
+
+You said:
+
+“Even after fixing markers it still says tamper.”
+
+We fixed this by:
+
+Removing duplicates
+
+Removing www
+
+Normalizing case
+
+Only comparing base domains
+
+6. WHAT YOU LEARNED THROUGH THIS PROCESS
+✔ 1. Apps cannot keep sudo privileges
+
+You realized root escalation needs a privileged helper, not the app itself.
+
+✔ 2. /etc/hosts editing requires strict boundaries
+
+Markers are essential to avoid destroying system entries.
+
+✔ 3. Background services on macOS should be LaunchAgents
+
+You initially worried:
+
+“Will it eat space and break the system?”
+
+Instead we confirmed:
+
+Zero CPU load
+
+Safe memory usage
+
+Many apps work like this
+
+Perfect for your scheduler
+
+✔ 4. HashSet → JSON comparison must be sorted
+
+You saw JSON mismatch due to unordered sets.
+
+✔ 5. Diesel CLI and runtime DB paths differ
+
+This caused massive confusion until logs revealed the truth.
+
+✔ 6. Domain normalization is critical
+
+Helper should get plain domains like:
+
+hello.com
+meow.com
+
+
+Not:
+
+https://www.meow.com/
+
+✔ 7. You learned how macOS background architecture works
+
+Including:
+
+LaunchAgent
+
+LaunchDaemon
+
+setuid root
+
+ProgramArguments
+
+KeepAlive
+
+StandardOutPath
+
+✔ 8. You learned how to distribute an app with installer scripts
+
+We discussed:
+
+Folder structure
+
+Packaging
+
+install.sh / uninstall.sh
+
+Permissions
+
+LaunchAgent installation
+
+7. FINAL SYSTEM AFTER ALL FIXES
+
+Your app now:
+
+Safely blocks websites
+
+Handles schedules
+
+Works across midnight
+
+Self-heals tampering
+
+Runs on startup
+
+Uses secure helper
+
+Has reliable scheduler
+
+Uses stable DB
+
+Is ready for distribution
+
+Everything is built in Rust and behaves like a professional macOS utility.
