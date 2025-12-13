@@ -2,7 +2,16 @@
 
 Blocky is a powerful, schedule-based website blocker for macOS. Unlike simple timer-based blockers, Blocky allows you to create multiple groups of websites with distinct weekly schedules, ensuring you stay productive without constantly managing your block lists.
 
-![App Screenshot](docs/app_screenshot.png) *(Add screenshot if available)*
+## Screenshots
+
+![Dashboard](app_screenshots/1.png)
+*Dashboard - Manage your blocking groups*
+
+![Edit Group](app_screenshots/2.png)
+*Edit Group - Customize domains and schedule*
+
+![Blocker Action](app_screenshots/3.png)
+*Blocker in Action*
 
 ## Features
 
