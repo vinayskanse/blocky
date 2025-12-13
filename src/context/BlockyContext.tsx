@@ -38,8 +38,6 @@ export const BlockyProvider = ({ children }: { children: ReactNode }) => {
     const fetchGroups = useCallback(async () => {
         setLoading(true);
         try {
-            // fake time
-            await new Promise((resolve) => setTimeout(resolve, 3000));
             const res = await invoke<Group[]>('get_all_groups');
             setGroups(res);
             setError(null);
