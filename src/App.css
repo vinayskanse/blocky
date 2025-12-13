@@ -94,7 +94,7 @@ h6 {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   width: 100%;
   text-align: center;
 }
@@ -107,11 +107,10 @@ h6 {
 }
 
 .logo-img {
-  width: 200px;
+  width: 120px;
   max-width: 40%;
   height: auto;
   object-fit: contain;
-  margin-bottom: -1rem;
 }
 
 /* Utilities */
