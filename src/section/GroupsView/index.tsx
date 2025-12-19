@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBlockyContext, Group, Schedule } from '../../context/BlockyContext';
 
 const GroupsView = () => {
@@ -9,6 +9,36 @@ const GroupsView = () => {
     const [editName, setEditName] = useState('');
     const [editDomains, setEditDomains] = useState('');
     const [editSchedule, setEditSchedule] = useState<Schedule>({ days: [], start: '09:00', end: '17:00' });
+
+    // Time state for locking active schedules
+    const [now, setNow] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 30000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const isGroupLocked = (group: Group): boolean => {
+        if (!group.enabled || !group.schedule || group.schedule.days.length === 0) return false;
+
+        const { days, start, end } = group.schedule;
+        const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const currentDay = daysMap[now.getDay()];
+
+        if (!days.includes(currentDay)) return false;
+
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const [startH, startM] = start.split(':').map(Number);
+        const [endH, endM] = end.split(':').map(Number);
+        const startTotal = startH * 60 + startM;
+        const endTotal = endH * 60 + endM;
+
+        if (startTotal <= endTotal) {
+            return currentMinutes >= startTotal && currentMinutes < endTotal;
+        } else {
+            return currentMinutes >= startTotal || currentMinutes < endTotal;
+        }
+    };
 
 
     const startEditing = (group: Group) => {
@@ -174,16 +204,31 @@ const GroupsView = () => {
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
                                             onClick={() => toggleGroup(group)}
+                                            disabled={isGroupLocked(group)}
                                             className={`btn ${group.enabled ? 'btn-secondary' : 'btn-primary'}`}
-                                            title={group.enabled ? 'Disable Group' : 'Enable Group'}
-                                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', minWidth: 'auto' }}
+                                            title={isGroupLocked(group) ? 'Group is locked during scheduled hours' : (group.enabled ? 'Disable Group' : 'Enable Group')}
+                                            style={{
+                                                padding: '0.4rem 0.75rem',
+                                                fontSize: '0.8rem',
+                                                minWidth: 'auto',
+                                                opacity: isGroupLocked(group) ? 0.5 : 1,
+                                                cursor: isGroupLocked(group) ? 'not-allowed' : 'pointer'
+                                            }}
                                         >
                                             {group.enabled ? 'Disable' : 'Enable'}
                                         </button>
                                         <button
                                             onClick={() => startEditing(group)}
+                                            disabled={isGroupLocked(group)}
                                             className="btn btn-secondary"
-                                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', minWidth: 'auto' }}
+                                            title={isGroupLocked(group) ? 'Editing disabled during scheduled hours' : 'Edit Group'}
+                                            style={{
+                                                padding: '0.4rem 0.75rem',
+                                                fontSize: '0.8rem',
+                                                minWidth: 'auto',
+                                                opacity: isGroupLocked(group) ? 0.5 : 1,
+                                                cursor: isGroupLocked(group) ? 'not-allowed' : 'pointer'
+                                            }}
                                         >
                                             Edit
                                         </button>
