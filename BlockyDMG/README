@@ -1,0 +1,5 @@
+If mac doesnt allow you, you might need to run this in terminal.
+it allows apple to run this.
+```bash
+xattr -dr com.apple.quarantine "Install Blocky.app"
+```

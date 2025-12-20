@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+echo "Setting Blocky permissions..."
+
+chown root:wheel /usr/local/bin/blocker_helper
+chmod 4755 /usr/local/bin/blocker_helper
+
+echo "Blocky installed successfully."
