@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+echo "[Blocky] Setting privileged helper permissions"
+
+HELPER="/usr/local/bin/blocker_helper"
+
+chown root:wheel "$HELPER"
+chmod 0755 "$HELPER"
+chmod 4755 "$HELPER"
+
+echo "[Blocky] Installation complete"
+
+# Reload Service
+echo "[Blocky] Reloading scheduler service..."
+launchctl bootout system/com.vinayskanse.blocky.scheduler 2>/dev/null || true
+launchctl bootstrap system /Library/LaunchDaemons/com.vinayskanse.blocky.scheduler.plist
