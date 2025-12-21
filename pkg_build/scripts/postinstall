@@ -11,7 +11,21 @@ chmod 4755 "$HELPER"
 
 echo "[Blocky] Installation complete"
 
-# Reload Service
+# Reload Service (LaunchAgent)
 echo "[Blocky] Reloading scheduler service..."
-launchctl bootout system/com.vinayskanse.blocky.scheduler 2>/dev/null || true
-launchctl bootstrap system /Library/LaunchDaemons/com.vinayskanse.blocky.scheduler.plist
+
+# Find the logged-in user
+CONSOLE_USER=$(scutil <<< "show State:/Users/ConsoleUser" | awk '/Name :/ && ! /loginwindow/ { print $3 }')
+CONSOLE_UID=$(id -u "$CONSOLE_USER")
+
+if [ -n "$CONSOLE_UID" ]; then
+    echo "[Blocky] Bootstrapping for user: $CONSOLE_USER ($CONSOLE_UID)"
+    
+    # Unload if exists
+    launchctl bootout "gui/$CONSOLE_UID/com.vinayskanse.blocky.scheduler" 2>/dev/null || true
+    
+    # Bootstrap
+    launchctl bootstrap "gui/$CONSOLE_UID" /Library/LaunchAgents/com.vinayskanse.blocky.scheduler.plist
+else
+    echo "[Blocky] No console user found, service will start on next login."
+fi

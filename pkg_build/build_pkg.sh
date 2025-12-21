@@ -48,13 +48,13 @@ cp target/release/blocker_scheduler "$BIN_DST/"
 chmod 755 "$BIN_DST/blocker_scheduler"
 
 # --------------------------------------------------
-# 2.5 Setup LaunchDaemon
+# 2.5 Setup LaunchAgent
 # --------------------------------------------------
-echo "→ Setting up LaunchDaemon"
-LD_DST="$PKGROOT/Library/LaunchDaemons"
-mkdir -p "$LD_DST"
-cp "$PKG_BUILD/com.vinayskanse.blocky.scheduler.plist" "$LD_DST/"
-chmod 644 "$LD_DST/com.vinayskanse.blocky.scheduler.plist"
+echo "→ Setting up LaunchAgent"
+LA_DST="$PKGROOT/Library/LaunchAgents"
+mkdir -p "$LA_DST"
+cp "$PKG_BUILD/com.vinayskanse.blocky.scheduler.plist" "$LA_DST/"
+chmod 644 "$LA_DST/com.vinayskanse.blocky.scheduler.plist"
 
 # --------------------------------------------------
 # 3. Build Blocky.app (Tauri)
